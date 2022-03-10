@@ -1,6 +1,8 @@
 import csv
 from tabulate import tabulate as tb
 import json
+import os
+from difflib import SequenceMatcher as SM
 
 class Sequence:
     
@@ -11,6 +13,7 @@ class Sequence:
 
     def print_type(self):
         return self.type    	
+
     def bagitiga(text):
     	return [text[i:i+3] for i in range(0,len(text),3)]
     	
@@ -40,7 +43,7 @@ class Sequence:
     	gly = cod.count('ggt')+cod.count('ggc')+cod.count('gga')+cod.count('ggg')#20
     
     	dna = {"Phe":(phe/len(cod))*100,"Leu":(leu/len(cod))*100,"Ile":( ile/len(cod))*100,"Met":(met/len(cod))*100,"Val" :( val/len(cod))*100,"Ser":( ser/len(cod))*100,"Pro":(pro/len(cod))*100,"Thr":(thr/len(cod))*100,"Ala":(ala/len(cod))*100,"Tyr":(tyr/len(cod))*100,"His":(his/len(cod))*100,"Gln":(gln/len(cod))*100,"Asn":(asn/len(cod))*100,"Lys":(lys/len(cod))*100,"Asp":(asp/len(cod))*100,"Glu":(glu/len(cod))*100,"Cys":(cys/len(cod))*100,"Trp":(trp/len(cod))*100,"Arg":(arg/len(cod))*100,"Gly":(gly/len(cod))*100,"Length":len(cod),"description":""}
-        self.seqtype = "dna"
+    	self.seqtype = "dna"
     	return dna
     
     def rna_to_code(cod):
@@ -67,17 +70,17 @@ class Sequence:
     	gly = cod.count('ggu')+cod.count('ggc')+cod.count('gga')+cod.count('ggg')#20
     	
     	rna = {"Phe":(phe/len(cod))*100,"Leu":(leu/len(cod))*100,"Ile":( ile/len(cod))*100,"Met":(met/len(cod))*100,"Val" :( val/len(cod))*100,"Ser":( ser/len(cod))*100,"Pro":(pro/len(cod))*100,"Thr":(thr/len(cod))*100,"Ala":(ala/len(cod))*100,"Tyr":(tyr/len(cod))*100,"His":(his/len(cod))*100,"Gln":(gln/len(cod))*100,"Asn":(asn/len(cod))*100,"Lys":(lys/len(cod))*100,"Asp":(asp/len(cod))*100,"Glu":(glu/len(cod))*100,"Cys":(cys/len(cod))*100,"Trp":(trp/len(cod))*100,"Arg":(arg/len(cod))*100,"Gly":(gly/len(cod))*100,"Length":len(cod),"description":""}
-        self.seqtype = "rna"
+    	self.seqtype = "rna"
     	return rna
     
     def decomp_amino_acid(self):
-    	gen = Genome.bagitiga(self.gen.lower())	
+    	gen = Sequence.bagitiga(self.gen.lower())	
     	if(self.type == "rna"):
                 
-    		return Genome.rna_to_code(gen)
+    		return Sequence.rna_to_code(gen)
     	else:
                 
-    		return Genome.dna_to_code(gen)
+    		return Sequence.dna_to_code(gen)
     
     def bagilagi(text):
     	txt = []
@@ -86,13 +89,30 @@ class Sequence:
     	return txt
     def codon2(text):
     	cc = []
-    	for i in text:
-    		hh = Genome.bagilagi(i)
+    	#teks = ""
+    	#if(len(text) % 3 != 0):
+    		#pan = len(text)-(len(text)%3)
+    		#teks = text[:pan]
+    	ll = Sequence.bagitiga(text)
+    	for i in ll:
+    		hh = Sequence.bagilagi(i)
     		cc.append(hh)
     	return cc
-    def dna_extract_nucleutide(cod):
-    	bb2 = Genome.bagitiga(cod)
-    	bb3 = Genome.codon2(bb2)
+    def codon3(text):
+    	cc = []
+    	teks = ""
+    	if(len(text) % 3 != 0):
+    		pan = len(text)-(len(text)%3)
+    		teks = text[:pan]
+    	ll = Sequence.bagitiga(teks)
+    	for i in ll:
+    		hh = Sequence.bagilagi(i)
+    		cc.append(hh)
+    	return cc
+    def dna_extract_nucleutide(codon):
+    	cod = codon.lower()
+    	bb2 = Sequence.bagitiga(cod)
+    	bb3 = Sequence.codon2(bb2)
     	a1,t1,g1,c1,a2,t2,g2,c2,a3,t3,g3,c3 = 0,0,0,0,0,0,0,0,0,0,0,0
     	for i in range(0,len(bb3)):
     		a1 += bb3[i][0].count("a")
@@ -110,36 +130,36 @@ class Sequence:
     	result = {"a1" : (a1/len(cod))*100,"t1" : (t1/len(cod))*100,"g1" : (g1/len(cod))*100,"c1" : (c1/len(cod))*100,"a2" : (a2/len(cod))*100,"t2" : (t2/len(cod))*100,"g2" : (g2/len(cod))*100,"c2" : (c2/len(cod))*100,"a3" : (a3/len(cod))*100,"t3" : (t3/len(cod))*100,"g3" : (g3/len(cod))*100,"c3" : (c3/len(cod))*100,"description":""}
         
     	return result
-    def rna_extract_nucleutide(cod):
-    		cod = genome.lower()
-    		bb2 = Genome.bagitiga(cod)
-    		bb3 = Genome.codon2(bb2)
-    		a1,u1,g1,c1,a2,u2,g2,c2,a3,u3,g3,c3 = 0,0,0,0,0,0,0,0,0,0,0,0
-    		for i in range(0,len(bb3)):
-    			a1 += bb3[i][0].count("a")
-    			u1 += bb3[i][0].count("u")
-    			g1 += bb3[i][0].count("g")
-    			c1 += bb3[i][0].count("c")
-    			a2 += bb3[i][1].count("a")
-    			u2 += bb3[i][1].count("u")
-    			g2 += bb3[i][1].count("g")
-    			c2 += bb3[i][1].count("c")
-    			a3 += bb3[i][2].count("a")
-    			u3 += bb3[i][2].count("u")
-    			g3 += bb3[i][2].count("g")
-    			c3 += bb3[i][2].count("c")
-    		result = {"a1" : (a1/len(cod))*100,"u1" : (u1/len(cod))*100,"g1" : (g1/len(cod))*100,"c1" : (c1/len(cod))*100,"a2" : (a2/len(cod))*100,"u2" : (u2/len(cod))*100,"g2" : (g2/len(cod))*100,"c2" : (c2/len(cod))*100,"a3" : (a3/len(cod))*100,"u3" : (u3/len(cod))*100,"g3" : (g3/len(cod))*100,"c3" : (c3/len(cod))*100,"description":""}
+    def rna_extract_nucleutide(codon):
+    	cod = codon.lower()
+    	bb2 = Sequence.bagitiga(cod)
+    	bb3 = Sequence.codon3(cod)
+    	a1,u1,g1,c1,a2,u2,g2,c2,a3,u3,g3,c3 = 0,0,0,0,0,0,0,0,0,0,0,0
+    	for i in range(0,len(bb3)):
+    		a1 += bb3[i][0].count("a")
+    		u1 += bb3[i][0].count("u")
+    		g1 += bb3[i][0].count("g")
+    		c1 += bb3[i][0].count("c")
+    		a2 += bb3[i][1].count("a")
+    		u2 += bb3[i][1].count("u")
+    		g2 += bb3[i][1].count("g")
+    		c2 += bb3[i][1].count("c")
+    		a3 += bb3[i][2].count("a")
+    		u3 += bb3[i][2].count("u")
+    		g3 += bb3[i][2].count("g")
+    		c3 += bb3[i][2].count("c")
+    	result = {"a1" : (a1/len(cod))*100,"u1" : (u1/len(cod))*100,"g1" : (g1/len(cod))*100,"c1" : (c1/len(cod))*100,"a2" : (a2/len(cod))*100,"u2" : (u2/len(cod))*100,"g2" : (g2/len(cod))*100,"c2" : (c2/len(cod))*100,"a3" : (a3/len(cod))*100,"u3" : (u3/len(cod))*100,"g3" : (g3/len(cod))*100,"c3" : (c3/len(cod))*100,"description":""}
                 
-    		return result
-    		
+    	return result
+    	
     def decomp_nucleutide(self):
     	gen = self.gen.lower()
     	if(self.type == "rna"):
                 
-    		return Genome.rna_extract_nucleutide(gen)
+    		return Sequence.rna_extract_nucleutide(gen)
     	else:
                 
-    		return Genome.dna_extract_nucleutide(gen)
+    		return Sequence.dna_extract_nucleutide(gen)
 
 
     def protein_extract(self):
@@ -176,8 +196,8 @@ class Sequence:
 
     def gen_to_csv(pp,namefile,seqtype):
          csv_columns1 = ["Phe","Leu","Ile","Met","Val","Ser","Pro","Thr","Ala","Tyr","His","Gln","Asn","Lys","Asp","Glu","Cys","Trp","Arg","Gly","Length","description"]
-         csv_columns2 = ["A1","T1","G1","C1","A2","T2","G2","C2","A3","T3","G3","C3"]
-         csv_columns3 = ["A1","U1","G1","C1","A2","U2","G2","C2","A3","U3","G3","C3"]
+         csv_columns2 = ["a1","t1","g1","c1","a2","t2","g2","c2","a3","t3","g3","c3","description"]
+         csv_columns3 = ["a1","u1","g1","c1","a2","u2","g2","c2","a3","u3","g3","c3","description"]
 
          if(seqtype == "atgc"):
              csv_columns = csv_columns2
@@ -205,7 +225,7 @@ class File:
         self.desc = []
         self.Gen = []
         self.result = []
-        self.typeresult = ""
+        self.typeresult = [0]
 
         if(self.type_ == "fasta"):
             x = open(self.file_,'r')
@@ -213,7 +233,7 @@ class File:
             aa = x.readlines()
             a = []
             for k in aa:
-                a.append(k.replace("\n",""))
+                a.append(k.lower().replace("\n",""))
             gen = []
             x.close()
             a[len(a)-1] = ">"
@@ -241,19 +261,21 @@ class File:
     def extract_to_nucl(self):
         #result = []
         if(self.data_ == "dna"):
+            self.typeresult[0] = "atgc"
             for ii in self.Gen:
-                Genom = Genome(ii,"dna")
-                genom_result = Genom.dna_extract_nucleutide()
+                Genom = Sequence(ii.lower(),"dna")
+                genom_result = Genom.decomp_nucleutide()
                 self.result.append(genom_result)
                 locat = self.Gen.index(ii);self.result[locat]['description'] = self.desc[locat]
-                self.typeresult = "atgc"
+            
         elif(self.data_ == "rna"):
+            self.typeresult[0] = "augc"
             for ii in self.Gen:
-                Genom = Genome(ii,"rna")
-                genom_result = Genom.dna_extract_nucleutide()
+                Genom = Sequence(ii.lower(),"rna")
+                genom_result = Genom.decomp_nucleutide()
                 self.result.append(genom_result)
                 locat = self.Gen.index(ii);self.result[locat]['description'] = self.desc[locat]
-                self.typeresult = "augc"
+            
         else:
             return "Type Incorrect"
         
@@ -263,27 +285,27 @@ class File:
         #result = []
         if(self.data_ == "dna" or self.data_ == "rna"):
             for ii in self.Gen:
-                Genom = Genome(ii,self.data_)
+                Genom = Sequence(ii,self.data_)
                 genom_result = Genom.decomp_amino_acid()
                 self.result.append(genom_result)
                 locat = self.Gen.index(ii);self.result[locat]['description'] = self.desc[locat]
-                self.typeresult = "amino"
+            self.typeresult = "amino"
         elif(self.data_ == "protein"):
             for ii in self.Gen:
-                Genom = Genome(ii,self.data_)
+                Genom = Sequence(ii,self.data_)
                 genom_result = Genom.protein_extract()
                 self.result.append(genom_result)
                 locat = self.Gen.index(ii);self.result[locat]['description'] = self.desc[locat]
-                self.typeresult = "amino"
+            self.typeresult = "amino"
         else:
             return "Type Incorrect"
             
         return self.result
 
     def exportCsv(self,name):
-        hh = Genome.gen_to_csv(self.result,name,self.typeresult)
+        hh = Sequence.gen_to_csv(self.result,name,self.typeresult[0])
         if(hh == "Success export to csv"):
-            return "Success export to csv"
+            return "Success export"+str(self.typeresult[0])+" to csv"
 
     def show(self):
         return tb(self.result, headers='keys', tablefmt='fancy_grid')
@@ -294,6 +316,27 @@ class File:
             json.dump(self.result, outfile)
         return "Exporting to JSON Finnish"
 
+    def mergeFiles(nameFile,typeFiles):
+        command = "cat *."+typeFiles+" > " + nameFile +"."+typeFiles
+        os.system(command)
+        return "Merge Files Finish"
+
+    def splitFiles(self,nameFiles,typeFile):
+        for i in range(0,len(self.Gen)):
+        	teks = self.desc[i]+"\n"+self.Gen[i]+"\n"
+        	name = nameFiles+"_"+str(i)+"."+typeFile
+        	files_op = open(name,"w")
+        	files_op.write(teks)
+        	files_op.close()
+        	print(name+" export finished")
+        return "All Split Files Finished"
+
+    def similarityRatio(gen):
+    	Genes = [None]
+    	for i in gen:
+    		Genes.append(i)
+    	similar = SM(Genes).ratio()
+    	return similar
 class About:
 
     def __version__():
